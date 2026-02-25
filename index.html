@@ -188,16 +188,17 @@
 
         .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* بطاقتين في السطر */
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* على الكمبيوتر يبقى كما كان */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 2.5rem;
     }
 }
+
 
 
         .product-card {
