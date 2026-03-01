@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parfum - Luxury Fragrance Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/lucide-react.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #d4af37;
+        }
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background-color: #fcfcfc;
+            padding-bottom: 80px;
+        }
+        .french-mode {
+            direction: ltr !important;
+            font-family: 'Poppins', sans-serif;
+        }
+        .product-card img {
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+        .related-products-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between mb-4">
+                <!-- Right: Search & Language -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" id="search-btn">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                    </button>
+                    <button onclick="toggleLanguage()" class="border border-gray-300 px-3 py-1 rounded-md text-sm font-bold hover:bg-gray-100" id="lang-btn">
+                        FR
+                    </button>
+                </div>
+
+                <!-- Center: Logo -->
+                <div class="flex justify-center">
+                    <img src="logo.png" alt="Parfum Logo" class="h-16 md:h-20 object-contain" onerror="this.src='https://placehold.co/200x80?text=PARFUM'">
+                </div>
+
+                <!-- Left: Menu -->
+                <div class="relative group">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" id="menu-btn">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
+                    </button>
+                    <!-- Mega Menu Dropdown -->
+                    <div class="hidden absolute left-0 top-full bg-white shadow-xl rounded-lg w-64 p-4 border group-hover:block">
+                        <div class="mb-4">
+                            <h3 class="font-bold border-b pb-1 mb-2 text-accent" data-i18n="group1">مجموعة 1</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <img src="image1.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                                <img src="image2.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                                <img src="image3.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold border-b pb-1 mb-2 text-accent" data-i18n="group2">مجموعة 2</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <img src="image4.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                                <img src="image5.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                                <img src="image6.jpg" class="rounded" onerror="this.src='https://placehold.co/50x50'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Icons below header -->
+            <div class="flex justify-center space-x-6 space-x-reverse py-2 border-t border-gray-100">
+                <a href="#" class="text-blue-600"><i data-lucide="facebook"></i></a>
+                <a href="#" class="text-pink-600"><i data-lucide="instagram"></i></a>
+                <a href="#" class="text-green-500"><i data-lucide="message-circle"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 mt-6">
+        
+        <!-- Shop View (Grid 2) -->
+        <section id="shop-view">
+            <h2 class="text-2xl font-bold mb-6 text-center" data-i18n="our-products">منتجاتنا المختارة</h2>
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4" id="products-grid">
+                <!-- Products will be injected here -->
+            </div>
+        </section>
+
+        <!-- Product Details View (Hidden by default) -->
+        <section id="details-view" class="hidden animate-fade-in">
+            <button onclick="showShop()" class="flex items-center text-gray-600 mb-4">
+                <i data-lucide="chevron-right" class="w-5 h-5 ml-1"></i>
+                <span data-i18n="back-to-shop">العودة للمتجر</span>
+            </button>
+            <div id="product-detail-content"></div>
+        </section>
+
+        <!-- Cart View (Hidden by default) -->
+        <section id="cart-view" class="hidden">
+            <h2 class="text-2xl font-bold mb-6" data-i18n="your-cart">سلة التسوق</h2>
+            <div id="cart-items" class="space-y-4 mb-8"></div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-lg border">
+                <h3 class="text-xl font-bold mb-4" data-i18n="checkout-form">معلومات الطلب</h3>
+                <form id="checkout-form" class="space-y-4" onsubmit="handleOrder(event)">
+                    <div>
+                        <label class="block text-sm mb-1" data-i18n="full-name">الاسم الكامل</label>
+                        <input type="text" required class="w-full border rounded-lg p-3">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1" data-i18n="phone">رقم الهاتف</label>
+                        <input type="tel" required class="w-full border rounded-lg p-3">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm mb-1" data-i18n="state">الولاية (58)</label>
+                            <select id="wilaya-select" class="w-full border rounded-lg p-3" onchange="updateShipping()">
+                                <option value="16">الجزائر (16)</option>
+                                <option value="31">وهران (31)</option>
+                                <option value="06">بجاية (06)</option>
+                                <!-- Map more states here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1" data-i18n="commune">البلدية</label>
+                            <input type="text" required class="w-full border rounded-lg p-3">
+                        </div>
+                    </div>
+                    <div class="flex gap-4 p-2 bg-gray-50 rounded-lg">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="delivery" value="desk" checked onchange="updateShipping()" class="ml-2">
+                            <span data-i18n="office">مكتب Yalidin</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="delivery" value="home" onchange="updateShipping()" class="ml-2">
+                            <span data-i18n="home">توصيل للمنزل</span>
+                        </label>
+                    </div>
+
+                    <div class="border-t pt-4 mt-6">
+                        <div class="flex justify-between mb-2">
+                            <span data-i18n="total-products">مجموع المنتجات:</span>
+                            <span id="subtotal">0 دج</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span data-i18n="shipping-cost">تكلفة التوصيل:</span>
+                            <span id="shipping-cost">400 دج</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-xl text-accent border-t pt-2">
+                            <span data-i18n="final-total">الإجمالي الكلي:</span>
+                            <span id="final-total">0 دج</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-black text-white py-4 rounded-xl font-bold mt-4 hover:bg-gray-800 transition shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        <span data-i18n="confirm-order">تأكيد الطلب الآن</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Success Message -->
+        <section id="success-view" class="hidden text-center py-20">
+            <div class="flex justify-center mb-4">
+                <div class="bg-green-100 p-4 rounded-full">
+                    <i data-lucide="check" class="w-12 h-12 text-green-600"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="thank-you">شكراً لطلبكم!</h2>
+            <p class="text-gray-600 mb-8" data-i18n="order-success">سنتصل بك لتأكيد الطلب في أقرب وقت.</p>
+            <button onclick="showShop()" class="bg-black text-white px-8 py-3 rounded-lg" data-i18n="continue-shopping">متابعة التسوق</button>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-3 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <button onclick="showShop()" class="flex flex-col items-center text-gray-400 focus:text-accent" id="nav-shop">
+            <i data-lucide="store" class="w-6 h-6"></i>
+            <span class="text-xs mt-1" data-i18n="nav-store">المتجر</span>
+        </button>
+        <button onclick="showCart()" class="flex flex-col items-center text-gray-400 focus:text-accent relative" id="nav-cart">
+            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+            <span class="text-xs mt-1" data-i18n="nav-cart">السلة</span>
+            <span id="cart-count" class="absolute -top-1 right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+    </nav>
+
+    <script>
+        // Data & State Management
+        const translations = {
+            ar: {
+                "group1": "مجموعة 1",
+                "group2": "مجموعة 2",
+                "our-products": "منتجاتنا المختارة",
+                "nav-store": "المتجر",
+                "nav-cart": "السلة",
+                "add-to-cart": "إضافة للسلة",
+                "capacity": "السعة (مل)",
+                "related-products": "منتجات ذات صلة",
+                "your-cart": "سلة التسوق",
+                "checkout-form": "معلومات الطلب",
+                "full-name": "الاسم الكامل",
+                "phone": "رقم الهاتف",
+                "state": "الولاية",
+                "commune": "البلدية",
+                "office": "مكتب Yalidin",
+                "home": "توصيل للمنزل",
+                "total-products": "مجموع المنتجات",
+                "shipping-cost": "تكلفة التوصيل",
+                "final-total": "الإجمالي الكلي",
+                "confirm-order": "تأكيد الطلب الآن",
+                "back-to-shop": "العودة للمتجر",
+                "thank-you": "شكراً لطلبكم!",
+                "order-success": "سنتصل بك لتأكيد الطلب في أقرب وقت.",
+                "continue-shopping": "متابعة التسوق",
+                "description": "الوصف"
+            },
+            fr: {
+                "group1": "Collection 1",
+                "group2": "Collection 2",
+                "our-products": "Nos Produits",
+                "nav-store": "Boutique",
+                "nav-cart": "Panier",
+                "add-to-cart": "Ajouter au panier",
+                "capacity": "Capacité (ml)",
+                "related-products": "Produits associés",
+                "your-cart": "Votre Panier",
+                "checkout-form": "Informations de commande",
+                "full-name": "Nom complet",
+                "phone": "Téléphone",
+                "state": "Wilaya",
+                "commune": "Commune",
+                "office": "Bureau Yalidin",
+                "home": "À Domicile",
+                "total-products": "Total produits",
+                "shipping-cost": "Frais de livraison",
+                "final-total": "Total final",
+                "confirm-order": "Confirmer la commande",
+                "back-to-shop": "Retour à la boutique",
+                "thank-you": "Merci pour votre commande!",
+                "order-success": "Nous vous contacterons bientôt pour confirmer.",
+                "continue-shopping": "Continuer les achats",
+                "description": "Description"
+            }
+        };
+
+        const products = [
+            { id: 1, name: "Night Oud", price: 4500, img: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=300", desc: "عطر ليلي ساحر بمزيج من العود والمسك الأبيض." },
+            { id: 2, name: "Rose Silk", price: 3800, img: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=300", desc: "رائحة ناعمة من الورد الفرنسي والياسمين." },
+            { id: 3, name: "Ocean Breeze", price: 3200, img: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=300", desc: "عطر صيفي منعش مستوحى من أمواج البحر." },
+            { id: 4, name: "Golden Amber", price: 5200, img: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=300", desc: "مزيج فاخر من العنبر الذهبي والزعفران." },
+            { id: 5, name: "Black Velvet", price: 4100, img: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=300", desc: "عطر غامض وجذاب لعشاق الروائح القوية." },
+            { id: 6, name: "Pure Musk", price: 2900, img: "https://images.unsplash.com/photo-1557170334-a9632e77c6e4?auto=format&fit=crop&w=300", desc: "عبير المسك الصافي الذي يدوم طوال اليوم." }
+        ];
+
+        let cart = [];
+        let currentLang = 'ar';
+
+        // Initialize App
+        window.onload = () => {
+            lucide.createIcons();
+            renderProducts();
+            updateLangUI();
+            updateCartCounter();
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+            document.body.classList.toggle('french-mode', currentLang === 'fr');
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'FR' : 'AR';
+            updateLangUI();
+            renderProducts();
+        }
+
+        function updateLangUI() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerText = translations[currentLang][key];
+            });
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map(p => `
+                <div class="product-card bg-white rounded-xl shadow-sm border overflow-hidden p-3 cursor-pointer" onclick="viewProduct(${p.id})">
+                    <img src="${p.img}" alt="${p.name}" class="w-full h-40 object-cover rounded-lg mb-2">
+                    <h3 class="font-bold text-center text-sm mb-1">${p.name}</h3>
+                    <p class="text-accent text-center font-bold text-lg">${p.price} دج</p>
+                </div>
+            `).join('');
+        }
+
+        function viewProduct(id) {
+            const product = products.find(p => p.id === id);
+            const related = products.filter(p => p.id !== id);
+            
+            document.getElementById('shop-view').classList.add('hidden');
+            document.getElementById('cart-view').classList.add('hidden');
+            document.getElementById('details-view').classList.remove('hidden');
+
+            const content = `
+                <div class="grid md:grid-cols-2 gap-8 bg-white p-4 rounded-2xl shadow-sm border">
+                    <div class="rounded-xl overflow-hidden">
+                        <img src="${product.img}" class="w-full object-cover">
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="text-3xl font-bold text-center mb-4 mt-2">${product.name}</h2>
+                        <p class="text-2xl text-accent font-bold mb-4 text-center">${product.price} دج</p>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold mb-2">${translations[currentLang]['capacity']}</label>
+                            <div class="flex gap-2">
+                                <input type="radio" name="ml" value="50" id="m50" checked class="hidden peer/50">
+                                <label for="m50" class="flex-1 text-center border p-2 rounded-lg peer-checked/50:bg-black peer-checked/50:text-white">50ml</label>
+                                
+                                <input type="radio" name="ml" value="100" id="m100" class="hidden peer/100">
+                                <label for="m100" class="flex-1 text-center border p-2 rounded-lg peer-checked/100:bg-black peer-checked/100:text-white">100ml</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="font-bold mb-2">${translations[currentLang]['description']}</h4>
+                            <p class="text-gray-600 leading-relaxed">${product.desc}</p>
+                        </div>
+
+                        <button onclick="addToCart(${product.id})" class="mt-auto w-full bg-black text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                            ${translations[currentLang]['add-to-cart']}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="font-bold text-xl mb-4">${translations[currentLang]['related-products']}</h3>
+                    <div class="flex overflow-x-auto gap-4 related-products-scroll pb-4">
+                        ${related.map(r => `
+                            <div class="min-w-[150px] bg-white rounded-lg border p-2 shadow-sm" onclick="viewProduct(${r.id})">
+                                <img src="${r.img}" class="h-24 w-full object-cover rounded mb-2">
+                                <p class="text-xs font-bold text-center">${r.name}</p>
+                                <p class="text-xs text-accent text-center font-bold">${r.price} دج</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('product-detail-content').innerHTML = content;
+            lucide.createIcons();
+            window.scrollTo(0,0);
+        }
+
+        function showShop() {
+            document.getElementById('shop-view').classList.remove('hidden');
+            document.getElementById('cart-view').classList.add('hidden');
+            document.getElementById('details-view').classList.add('hidden');
+            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('nav-shop').classList.add('text-accent');
+            document.getElementById('nav-cart').classList.remove('text-accent');
+        }
+
+        function showCart() {
+            document.getElementById('shop-view').classList.add('hidden');
+            document.getElementById('details-view').classList.add('hidden');
+            document.getElementById('success-view').classList.add('hidden');
+            document.getElementById('cart-view').classList.remove('hidden');
+            document.getElementById('nav-cart').classList.add('text-accent');
+            document.getElementById('nav-shop').classList.remove('text-accent');
+            renderCartItems();
+            updateShipping();
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const size = document.querySelector('input[name="ml"]:checked').value;
+            
+            cart.push({...product, size, qty: 1});
+            updateCartCounter();
+            
+            // Temporary feedback
+            const btn = document.querySelector('button[onclick^="addToCart"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> تم الإضافة`;
+            btn.classList.replace('bg-black', 'bg-green-600');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.replace('bg-green-600', 'bg-black');
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        function updateCartCounter() {
+            const count = cart.length;
+            const badge = document.getElementById('cart-count');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">السلة فارغة</p>`;
+                return;
+            }
+            container.innerHTML = cart.map((item, idx) => `
+                <div class="flex items-center bg-white p-3 rounded-lg border gap-4">
+                    <img src="${item.img}" class="w-16 h-16 rounded object-cover">
+                    <div class="flex-1">
+                        <h4 class="font-bold">${item.name} (${item.size}ml)</h4>
+                        <p class="text-accent font-bold">${item.price} دج</p>
+                    </div>
+                    <button onclick="removeFromCart(${idx})" class="text-red-400 p-2">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            renderCartItems();
+            updateCartCounter();
+            updateShipping();
+        }
+
+        function updateShipping() {
+            const wilaya = document.getElementById('wilaya-select').value;
+            const type = document.querySelector('input[name="delivery"]:checked').value;
+            
+            // Yalidin Dummy Logic: 16 (Algiers) is cheaper
+            let shipping = (wilaya === '16') ? 300 : 500;
+            if (type === 'home') shipping += 300;
+            
+            const subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+            
+            document.getElementById('subtotal').innerText = `${subtotal} دج`;
+            document.getElementById('shipping-cost').innerText = `${shipping} دج`;
+            document.getElementById('final-total').innerText = `${subtotal + shipping} دج`;
+        }
+
+        function handleOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) return;
+            
+            // In a real app, send data to backend here
+            document.getElementById('cart-view').classList.add('hidden');
+            document.getElementById('success-view').classList.remove('hidden');
+            cart = [];
+            updateCartCounter();
+        }
+
+    </script>
+</body>
+</html>
+
